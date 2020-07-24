@@ -1,1 +1,2 @@
-# NippoGAS
+# GAS_NippoLibrary
+GAS_NippoWebAppのライブラリとして使用する
