@@ -16,7 +16,6 @@ function doPost(e) {
   
   var event = JSON.parse(e.postData.contents).events[0];
   var userId = event.source.userId;
-  var message = event.message.text;
   var timestamp = event.timestamp;
   
   addLog(event);
@@ -31,6 +30,7 @@ function doPost(e) {
   
   var reply_text = "";
   
+  var message = event.message.text;
   if(message == MESSAGE_ARG_ALREADY){reply_text = findMessage(MESSAGE_CAL_ALREADY)};
   if(message == MESSAGE_ARG_WILL){reply_text = findMessage(MESSAGE_CAL_WILL)};
   if(message == MESSAGE_SRG_REST){reply_text = findMessage(MESSAGE_CAL_REST)};
