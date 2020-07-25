@@ -17,6 +17,7 @@ function addUser(userId, name){
   
   sheet.getRange(low, 1).setValue(userId);
   sheet.getRange(low, 2).setValue(name);
+  sheet.getRange(low, 3).setValue(0);
   
 }
 
@@ -41,7 +42,6 @@ function existReplyHistory(userId){
       continue;
     }
     //今日の0時以降のメッセージか
-    Logger.log(historysValues[row][1] > midnughtToday );
     if ( historysValues[row][1] > midnughtToday ) {
       return true;
     }
@@ -51,28 +51,29 @@ function existReplyHistory(userId){
   return false;
 }
 
-function findMessage(cal){
+//指定した列のメッセージをランダムに返す
+function findRandomMessage(cal){
+  return findMessage(cal, getRandomMessageRow());
+}
+
+function getRandomMessageRow(){
+  // メッセージの数(先頭行はタイトルのため -1 )
+  var messageCount = spreadsheet.getSheetByName('message').getLastRow() - 1;
+  // メッセージ行をランダムに選択
+  return Math.floor(Math.random()*messageCount);
+}
+
+//指定した列行のメッセージを返す
+function findMessage(messageCal,messageRow){
   // スプレッドシート連携
   var sheet = spreadsheet.getSheetByName('message');
   
   // 全データ（空含む）を2次元配列に読み込み
   var values = sheet.getDataRange().getValues();
   
-  var defaultMessageList = []
-  
-  // row 0 = 1行目はタイトルなので、 row = 1から始める
-  for ( var row = 1; row < sheet.getLastRow(); row++ ) {
-    if ( values[row][cal] != '' ) {
-      defaultMessageList.push(values[row][cal]);
-    }
-  }
-  
-  // デフォルトメッセージからランダムに選択
-  rndNum = Math.floor(Math.random()*defaultMessageList.length);
-  
-  return defaultMessageList[rndNum];
+  //一行目はタイトルのため +1
+  return values[messageRow + 1][messageCal];
 }
-
 
 function addLog(event){
   var sheet = spreadsheet.getSheetByName('log');
@@ -92,18 +93,47 @@ function addHistory(userId, date, message){
   
 }
 
-function findUsersId(){
-   //利用ユーザ抽出
+function findUsers(){
+  //利用ユーザ抽出
+  var usersSheet = spreadsheet.getSheetByName('users');
+  var usersValues = usersSheet.getDataRange().getValues();
+  //タイトル行消す TODO:破壊的変更怖い
+  usersValues.shift();
+  
+  return usersValues;
+}
+
+function incrementReminderCount(userId){
+  
+  //利用ユーザ抽出
   var usersSheet = spreadsheet.getSheetByName('users');
   var usersValues = usersSheet.getDataRange().getValues();
   
-  var usersId = [];
-  
+  //指定されたユーザの行を特定
+  var targetRow = 0;
   for ( var row = 1; row < usersSheet.getLastRow(); row++ ) {
-    if ( usersValues[row][0] != '' ) {
-      usersId.push(usersValues[row][0]);
+    if ( usersValues[row][0] == userId ) {
+      targetRow = row;
     }
   }
+  //特定したユーザの催促数を１増やす
+  var targetRange = usersSheet.getRange(targetRow+1, 3);
+  targetRange.setValue(targetRange.getValue() + 1);
+}
+
+function clearReminderCount(userId){
   
-  return usersId;
+  //利用ユーザ抽出
+  var usersSheet = spreadsheet.getSheetByName('users');
+  var usersValues = usersSheet.getDataRange().getValues();
+  
+  //指定されたユーザの行を特定
+  var targetRow = 0;
+  for ( var row = 1; row < usersSheet.getLastRow(); row++ ) {
+    if ( usersValues[row][0] == userId ) {
+      targetRow = row;
+    }
+  }
+  //特定したユーザの催促数を０にする
+  usersSheet.getRange(targetRow+1, 3).setValue(0);
 }

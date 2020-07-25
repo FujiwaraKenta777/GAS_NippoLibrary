@@ -6,6 +6,7 @@ var MESSAGE_CAL_DID = 0;
 var MESSAGE_CAL_ALREADY = 1;
 var MESSAGE_CAL_WILL = 2;
 var MESSAGE_CAL_REST = 3;
+var MESSAGE_CAL_REMINDER = 4;
 
 var MESSAGE_ARG_ALREADY = "送った";
 var MESSAGE_ARG_WILL = "これから";
@@ -32,9 +33,9 @@ function doPost(e) {
   var reply_text = "";
   
   var message = event.message.text;
-  if(message == MESSAGE_ARG_ALREADY){reply_text = findMessage(MESSAGE_CAL_ALREADY)};
-  if(message == MESSAGE_ARG_WILL){reply_text = findMessage(MESSAGE_CAL_WILL)};
-  if(message == MESSAGE_SRG_REST){reply_text = findMessage(MESSAGE_CAL_REST)};
+  if(message == MESSAGE_ARG_ALREADY){reply_text = findRandomMessage(MESSAGE_CAL_ALREADY)};
+  if(message == MESSAGE_ARG_WILL){reply_text = findRandomMessage(MESSAGE_CAL_WILL)};
+  if(message == MESSAGE_SRG_REST){reply_text = findRandomMessage(MESSAGE_CAL_REST)};
   
   if(existReplyHistory(userId)){reply_text = 'もう聞いたよ'};
   
@@ -58,19 +59,36 @@ function doPost(e) {
   
   addHistory(userId, new Date(timestamp), message);
   addLog(event);
+  clearReminderCount(userId);
   
 }
 
 function pushMessage() {
-  var usersId = findUsersId();
+  var users = findUsers();
   
-  for (const userId of usersId) {
+  for (const user of users) {
+    
+    var userId = user[0];
+    var reminderCount = user[2];
     
     if(canNotSend(userId)){
       return;
     }
     
-    var text = findMessage(MESSAGE_CAL_DID);
+    var text = "";
+    
+    if(reminderCount > 0){
+      //同じ行の確認メッセージと催促メッセージを取得する  
+      var messageRow = getRandomMessageRow();
+      var didMessage =  findMessage(MESSAGE_CAL_DID, messageRow);
+      var reminderMessage =  findMessage(MESSAGE_CAL_REMINDER, messageRow);
+      
+      [...Array(reminderCount)].map(() => text = text + reminderMessage + "\n")
+      text = text + didMessage;
+      
+    } else {
+      text =  findRandomMessage(MESSAGE_CAL_DID);
+    }
     
     var postData = {
       "to": userId,
@@ -92,6 +110,8 @@ function pushMessage() {
       "payload": JSON.stringify(postData)
     };
     var response = UrlFetchApp.fetch(url, options);
+    
+    incrementReminderCount(userId);
   }
 }
 
