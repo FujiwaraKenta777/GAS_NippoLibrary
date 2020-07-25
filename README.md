@@ -18,7 +18,7 @@ nippoService.gs はスプレッドシート操作メソッドを管理してい�
 
 * usersシート
 
-![usersシート](https://user-images.githubusercontent.com/53109614/88423341-98736580-ce26-11ea-9ce9-c265643b9e3f.png)
+![usersシート](https://user-images.githubusercontent.com/53109614/88463511-3da54100-ceee-11ea-9d62-c64b5d231eb9.png)
 
 * logシート
 
