@@ -18,10 +18,11 @@ function doPost(e) {
   var userId = event.source.userId;
   var timestamp = event.timestamp;
   
-  addLog(event);
+  //followイベント（新規登録、ブロック解除時）でユーザ登録する
   if ( event.type == 'follow' ) {
     var name = findUserName(userId);
     addUser(userId, name);
+    addLog(event);
     return;
   }
   
@@ -56,6 +57,7 @@ function doPost(e) {
   });
   
   addHistory(userId, new Date(timestamp), message);
+  addLog(event);
   
 }
 
@@ -68,10 +70,8 @@ function pushMessage() {
       return;
     }
     
-    Logger.log(userId);
     var text = findMessage(MESSAGE_CAL_DID);
     
-    Logger.log(text);
     var postData = {
       "to": userId,
       "messages": [{
