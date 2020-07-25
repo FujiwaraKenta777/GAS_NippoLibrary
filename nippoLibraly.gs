@@ -21,7 +21,7 @@ function doPost(e) {
   
   addLog(event);
   if ( event.type == 'follow' ) {
-    var name = findUserName(event.source.userId, CHANNEL_ACCESS_TOKEN);
+    var name = findUserName(userId);
     addUser(userId, name);
     return;
   }
