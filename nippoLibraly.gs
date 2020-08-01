@@ -131,7 +131,55 @@ function findUserName(userId){
   return name;
 }
 
+function isWeekEnd(today){
+  //曜日取得
+  //getDay() 0は日曜日、1は月曜日、2は火曜日、3は水曜日、4は木曜日、5は金曜日、6は土曜日
+  var dayOfWeek = today.getDay();
+  if(dayOfWeek <= 0 || dayOfWeek >= 6){
+    return true;
+  }
+  
+  //祝日
+  //Googleカレンダー「日本の祝日」よりにイベントとして登録されている日を祝日とする
+  var japaneseHolidaysCalendars = CalendarApp.getCalendarsByName("日本の祝日");
+  var japaneseHolidays = japaneseHolidaysCalendars[0];
+  var events = japaneseHolidays.getEventsForDay(today);
+  if(events.length > 0){
+    return true;
+  }
+  
+  return false; 
+}
+
+
+function testIsWeekEnd(){
+  console.log("本日");
+  //本日
+  console.log(isWeekEnd(new Date()));
+  
+  console.log("休み");
+  //土曜日
+  console.log(isWeekEnd(new Date(2020,7,8)));
+  //日曜日
+  console.log(isWeekEnd(new Date(2020,7,9)));
+  //祝日
+  console.log(isWeekEnd(new Date(2020,7,10)));
+  //祝日（土曜・春分の日）
+  console.log(isWeekEnd(new Date(2021,2,20)));
+  
+  console.log("平日");
+  //月曜日
+  console.log(isWeekEnd(new Date(2020,7,3)));
+  //金曜日
+  console.log(isWeekEnd(new Date(2020,7,7)));
+}
+
 function canNotSend(userId){
+  //休みの日は送らない
+  if(isWeekEnd(new Date())){
+    return true;
+  }
+  
   //0:00～18:30は送らない
   var zeroHours = new Date().setHours(0, 0, 0, 0);
   var goHomeHours = new Date().setHours(18, 30, 0, 0);
