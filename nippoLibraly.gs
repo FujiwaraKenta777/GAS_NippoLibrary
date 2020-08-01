@@ -7,6 +7,7 @@ var MESSAGE_CAL_ALREADY = 1;
 var MESSAGE_CAL_WILL = 2;
 var MESSAGE_CAL_REST = 3;
 var MESSAGE_CAL_REMINDER = 4;
+var MESSAGE_CAL_ALREADY_HOLIDAY = 5;
 
 var MESSAGE_ARG_ALREADY = "送った";
 var MESSAGE_ARG_WILL = "これから";
@@ -33,7 +34,7 @@ function doPost(e) {
   var reply_text = "";
   
   var message = event.message.text;
-  if(message == MESSAGE_ARG_ALREADY){reply_text = findRandomMessage(MESSAGE_CAL_ALREADY)};
+  if(message == MESSAGE_ARG_ALREADY){reply_text = isHoliday ? findRandomMessage(MESSAGE_CAL_ALREADY_HOLIDAY) : findRandomMessage(MESSAGE_CAL_ALREADY)};
   if(message == MESSAGE_ARG_WILL){reply_text = findRandomMessage(MESSAGE_CAL_WILL)};
   if(message == MESSAGE_SRG_REST){reply_text = findRandomMessage(MESSAGE_CAL_REST)};
   
@@ -131,7 +132,7 @@ function findUserName(userId){
   return name;
 }
 
-function isWeekEnd(today){
+function isHoliday(today){
   //曜日取得
   //getDay() 0は日曜日、1は月曜日、2は火曜日、3は水曜日、4は木曜日、5は金曜日、6は土曜日
   var dayOfWeek = today.getDay();
@@ -152,31 +153,31 @@ function isWeekEnd(today){
 }
 
 
-function testIsWeekEnd(){
+function testIsHoliday(){
   console.log("本日");
   //本日
-  console.log(isWeekEnd(new Date()));
+  console.log(isHoliday(new Date()));
   
   console.log("休み");
   //土曜日
-  console.log(isWeekEnd(new Date(2020,7,8)));
+  console.log(isHoliday(new Date(2020,7,8)));
   //日曜日
-  console.log(isWeekEnd(new Date(2020,7,9)));
+  console.log(isHoliday(new Date(2020,7,9)));
   //祝日
-  console.log(isWeekEnd(new Date(2020,7,10)));
+  console.log(isHoliday(new Date(2020,7,10)));
   //祝日（土曜・春分の日）
-  console.log(isWeekEnd(new Date(2021,2,20)));
+  console.log(isHoliday(new Date(2021,2,20)));
   
   console.log("平日");
   //月曜日
-  console.log(isWeekEnd(new Date(2020,7,3)));
+  console.log(isHoliday(new Date(2020,7,3)));
   //金曜日
-  console.log(isWeekEnd(new Date(2020,7,7)));
+  console.log(isHoliday(new Date(2020,7,7)));
 }
 
 function canNotSend(userId){
   //休みの日は送らない
-  if(isWeekEnd(new Date())){
+  if(isHoliday(new Date())){
     return true;
   }
   
