@@ -34,7 +34,7 @@ function doPost(e) {
   var reply_text = "";
   
   var message = event.message.text;
-  if(message == MESSAGE_ARG_ALREADY){reply_text = isHoliday ? findRandomMessage(MESSAGE_CAL_ALREADY_HOLIDAY) : findRandomMessage(MESSAGE_CAL_ALREADY)};
+  if(message == MESSAGE_ARG_ALREADY){reply_text = isHoliday(new Date()) ? findRandomMessage(MESSAGE_CAL_ALREADY_HOLIDAY) : findRandomMessage(MESSAGE_CAL_ALREADY)};
   if(message == MESSAGE_ARG_WILL){reply_text = findRandomMessage(MESSAGE_CAL_WILL)};
   if(message == MESSAGE_SRG_REST){reply_text = findRandomMessage(MESSAGE_CAL_REST)};
   
